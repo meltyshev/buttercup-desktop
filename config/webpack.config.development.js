@@ -1,55 +1,90 @@
 const { resolve } = require('path');
 const webpack = require('webpack');
-const merge = require('webpack-merge');
-const baseConfig = require('./webpack.config.base');
+// const merge = require('webpack-merge');
+// const baseConfig = require('./webpack.config.base');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
-module.exports = merge(baseConfig, {
-  devtool: 'cheap-module-eval-source-map',
-
+module.exports = {
+  context: process.cwd(),
+  mode: 'development',
   entry: {
-    main: [
-      'react-hot-loader/patch',
-      resolve(__dirname, '../src/renderer/index')
-    ],
-    fileManager: resolve(__dirname, '../src/renderer/file-manager'),
-    update: resolve(__dirname, '../src/renderer/update'),
-    fileHostConnection: resolve(
-      __dirname,
-      '../src/renderer/file-host-connection'
-    )
+    renderer: resolve(__dirname, '../src/entries/renderer.tsx'),
+    preload: resolve(__dirname, '../src/entries/preload.ts')
   },
-
+  output: {
+    filename: '[name].bundle.js',
+    path: resolve(__dirname, '../app/dist/')
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all'
+    }
+  },
+  module: {
+    rules: [
+      {
+        test: /.tsx?$/,
+        use: [{ loader: 'ts-loader', options: { transpileOnly: true } }]
+      }
+    ]
+  },
+  plugins: [new ForkTsCheckerWebpackPlugin()],
   devServer: {
     hot: true,
-    contentBase: baseConfig.output.path,
+    contentBase: resolve(__dirname, '../app/dist/'),
     publicPath: '/app',
     port: 3000,
     stats: 'normal'
-  },
+  }
+};
 
-  output: {
-    publicPath: 'http://localhost:3000/app/'
-  },
+// module.exports = merge(baseConfig, {
+//   devtool: 'cheap-module-eval-source-map',
 
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development')
-    }),
-    new webpack.LoaderOptionsPlugin({
-      debug: true
-    })
-  ],
+//   entry: {
+//     main: [
+//       'react-hot-loader/patch',
+//       resolve(__dirname, '../src/renderer/index')
+//     ],
+//     fileManager: resolve(__dirname, '../src/renderer/file-manager'),
+//     update: resolve(__dirname, '../src/renderer/update'),
+//     fileHostConnection: resolve(
+//       __dirname,
+//       '../src/renderer/file-host-connection'
+//     )
+//   },
 
-  externals: [],
+//   devServer: {
+//     hot: true,
+//     contentBase: baseConfig.output.path,
+//     publicPath: '/app',
+//     port: 3000,
+//     stats: 'normal'
+//   },
 
-  resolve: {
-    alias: { 'react-dom': '@hot-loader/react-dom' }
-  },
+//   output: {
+//     publicPath: 'http://localhost:3000/app/'
+//   },
 
-  node: {
-    __dirname: false
-  },
-  mode: 'development',
-  target: 'electron-renderer'
-});
+//   plugins: [
+//     new webpack.HotModuleReplacementPlugin(),
+//     new webpack.DefinePlugin({
+//       'process.env.NODE_ENV': JSON.stringify('development')
+//     }),
+//     new webpack.LoaderOptionsPlugin({
+//       debug: true
+//     })
+//   ],
+
+//   externals: [],
+
+//   resolve: {
+//     alias: { 'react-dom': '@hot-loader/react-dom' }
+//   },
+
+//   node: {
+//     __dirname: false
+//   },
+//   mode: 'development',
+//   target: 'electron-renderer'
+// });
