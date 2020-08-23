@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce';
 import { isHighSierra, isOSX } from '../shared/utils/platform';
 import { getWindowManager } from './lib/window-manager';
 import { getSetting } from '../shared/selectors';
-import { getURIPathToFile } from './lib/utils';
+import { getURIPathToFile, getPathToFile } from './lib/utils';
 import { loadFile } from './lib/files';
 import { config } from '../shared/config';
 import { checkForUpdates } from './lib/updater';
@@ -12,7 +12,7 @@ import { setSetting } from '../shared/actions/settings';
 
 const windowManager = getWindowManager();
 
-export function setupWindows(store) {
+export function setupWindows(store = undefined) {
   // Intro Screen
   windowManager.setBuildProcedure('main', callback => {
     const [width, height] = config.get('window.size', [950, 700]);
@@ -60,12 +60,12 @@ export function setupWindows(store) {
     );
 
     // Set initial menu bar visibility
-    const menubarAutoHide = getSetting(store.getState(), 'menubarAutoHide');
-    win.setAutoHideMenuBar(
-      typeof menubarAutoHide === 'boolean' ? menubarAutoHide : false
-    );
+    // const menubarAutoHide = getSetting(store.getState(), 'menubarAutoHide');
+    // win.setAutoHideMenuBar(
+    //   typeof menubarAutoHide === 'boolean' ? menubarAutoHide : false
+    // );
 
-    win.loadURL(getURIPathToFile('views/index.html'));
+    win.loadFile(getPathToFile('views/index.html'));
 
     // When user drops a file on the window
     win.webContents.on('will-navigate', (e, url) => {
@@ -73,12 +73,12 @@ export function setupWindows(store) {
       loadFile(url, win);
     });
 
-    win.on('focus', () =>
-      store.dispatch(setSetting('isButtercupFocused', true))
-    );
-    win.on('blur', () =>
-      store.dispatch(setSetting('isButtercupFocused', false))
-    );
+    // win.on('focus', () =>
+    //   store.dispatch(setSetting('isButtercupFocused', true))
+    // );
+    // win.on('blur', () =>
+    //   store.dispatch(setSetting('isButtercupFocused', false))
+    // );
 
     win.once('ready-to-show', () => {
       win.show();
@@ -89,30 +89,30 @@ export function setupWindows(store) {
         callback(win);
       }
 
-      if (!getSetting(store.getState(), 'updateOnStartDisabled')) {
-        setTimeout(() => {
-          checkForUpdates(true);
-        }, ms('5s'));
-      }
+      // if (!getSetting(store.getState(), 'updateOnStartDisabled')) {
+      //   setTimeout(() => {
+      //     checkForUpdates(true);
+      //   }, ms('5s'));
+      // }
     });
 
-    win.on('hide', () => {
-      if (getSetting(store.getState(), 'lockArchiveOnMinimize')) {
-        win.webContents.send('lock-all-archives');
-      }
-    });
+    // win.on('hide', () => {
+    //   if (getSetting(store.getState(), 'lockArchiveOnMinimize')) {
+    //     win.webContents.send('lock-all-archives');
+    //   }
+    // });
 
-    win.once('closed', () => {
-      windowManager.deregister(win);
-      if (isOSX() && getSetting(store.getState(), 'isTrayIconEnabled')) {
-        app.dock.hide();
-      }
-    });
+    // win.once('closed', () => {
+    //   windowManager.deregister(win);
+    //   if (isOSX() && getSetting(store.getState(), 'isTrayIconEnabled')) {
+    //     app.dock.hide();
+    //   }
+    // });
 
     return win;
   });
 
-  windowManager.setBuildProcedure('file-manager', (callback, options) => {
+  /* windowManager.setBuildProcedure('file-manager', (callback, options) => {
     const win = new BrowserWindow({
       width: 650,
       height: 450,
@@ -257,5 +257,5 @@ export function setupWindows(store) {
 
       return win;
     }
-  );
+  ); */
 }

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Buttercup</title>
     <script>
       (function() {
@@ -11,14 +11,16 @@
           link.href = '../dist/main.css';
           document.write(link.outerHTML);
         }
-      }());
+      })();
     </script>
   </head>
   <body>
     <div id="root"></div>
     <script>
       const script = document.createElement('script');
-      script.src = (process.env.HOT) ? 'http://localhost:3000/app/main.bundle.js' : '../dist/main.bundle.js';
+      script.src = process.env.HOT
+        ? 'http://localhost:3000/app/main.bundle.js'
+        : '../dist/main.bundle.js';
       document.head.appendChild(script);
     </script>
   </body>

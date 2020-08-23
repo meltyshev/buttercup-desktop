@@ -71,7 +71,7 @@ function showSaveDialog(focusedWindow) {
  * @param {String} filePath
  * @param {BrowserWindow} win
  */
-export function loadFile(filePath, win, isNew = false) {
+export function loadFile(filePath, win = undefined, isNew = false) {
   const payload = {
     type: ArchiveTypes.FILE,
     path: normalizePath(filePath),

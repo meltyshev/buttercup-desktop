@@ -1,6 +1,5 @@
 {
   "presets": [
-    "@babel/preset-react",
     [
       "@babel/preset-env",
       {
@@ -12,7 +11,9 @@
         "modules": false,
         "loose": true
       }
-    ]
+    ],
+    "@babel/preset-typescript",
+    "@babel/preset-react"
   ],
   "plugins": [
     "lodash",
@@ -24,6 +25,9 @@
     ["webpack-alias", { "config": "./config/webpack.config.base.js" }]
   ],
   "env": {
+    "development": {
+      "plugins": ["react-hot-loader/babel"]
+    },
     "production": {
       "plugins": [
         "transform-remove-console",

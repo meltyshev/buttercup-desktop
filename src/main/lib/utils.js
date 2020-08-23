@@ -6,7 +6,7 @@ export function getURIPathToFile(fileName) {
 
 export function getPathToFile(fileName) {
   if (process.env.NODE_ENV === 'development') {
-    return `${path.join(__dirname, `../../../app/${fileName}`)}`;
+    return path.join(__dirname, `../../../app/${fileName}`);
   }
-  return `${path.join(__dirname, `../${fileName}`)}`;
+  return path.join(__dirname, `../${fileName}`);
 }

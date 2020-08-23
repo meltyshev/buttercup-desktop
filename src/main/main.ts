@@ -1,32 +1,20 @@
 import { app, session } from 'electron';
-import pify from 'pify';
 import log from 'electron-log';
-import jsonStorage from 'electron-json-storage';
-import configureStore from '../shared/store/configure-store';
-import { filterStore } from '../shared/store/filter-store';
-import { setupMenu } from './menu';
-import { getWindowManager } from './lib/window-manager';
-import { sendEventToMainWindow, reopenMainWindow } from './utils/window';
+import { isOSX, isWindows } from '../shared/utils/platform';
+import { handleProtocolCall } from './actions';
 import { loadFile } from './lib/files';
 import { getQueue } from './lib/queue';
-import { isWindows, isOSX } from '../shared/utils/platform';
-import { sleep } from '../shared/utils/promise';
-import { setupActions, handleProtocolCall } from './actions';
-import { setupWindows } from './windows';
+import { getWindowManager } from './lib/window-manager';
 import { getFilePathFromArgv } from './utils/argv';
-import { getSetting } from '../shared/selectors';
-import {
-  setupGlobalShortcuts,
-  unregisterGlobalShortcuts
-} from './global-shortcuts';
+import { reopenMainWindow, sendEventToMainWindow } from './utils/window';
+import { setupWindows } from './windows';
 
 log.info('Buttercup starting up...');
 
-// Unhandled rejections
-const unhandled = require('electron-unhandled');
-unhandled();
+// // Unhandled rejections
+// const unhandled = require('electron-unhandled');
+// unhandled();
 
-const storage = pify(jsonStorage);
 const windowManager = getWindowManager();
 
 let appIsReady = false;
@@ -107,7 +95,7 @@ app.on('open-url', (e, url) => {
 app.on('ready', async () => {
   if (process.env.NODE_ENV === 'development') {
     // Install Dev Extensions
-    await installExtensions();
+    // await installExtensions();
   }
 
   // Set origin for network requests
@@ -116,35 +104,8 @@ app.on('ready', async () => {
     callback({ cancel: false, requestHeaders: details.requestHeaders });
   });
 
-  // Create Store
-  let state = {};
-  try {
-    state = await storage.get('state');
-    log.info('Restoring state...', state);
-  } catch (err) {
-    log.error('Unable to read state json file', err);
-  }
-  const store = configureStore(filterStore(state));
-
-  // Persist Store to Disk
-  store.subscribe(() => {
-    getQueue()
-      .channel('saves')
-      .enqueue(
-        () =>
-          storage
-            .set('state', filterStore(store.getState()))
-            .then(() => sleep(100)),
-        undefined,
-        'store'
-      );
-  });
-
   // Setup Windows & IPC Actions
-  setupWindows(store);
-  setupActions(store);
-  setupMenu(store);
-  setupGlobalShortcuts(store);
+  setupWindows();
 
   appIsReady = true;
 
@@ -160,16 +121,16 @@ app.on('ready', async () => {
 
   // When user closes all windows
   // On Windows, the command practice is to quit the app.
-  app.on('window-all-closed', () => {
-    if (
-      appTriedToQuit ||
-      (!isOSX() && !getSetting(store.getState(), 'isTrayIconEnabled'))
-    ) {
-      unregisterGlobalShortcuts();
+  // app.on('window-all-closed', () => {
+  //   if (
+  //     appTriedToQuit ||
+  //     (!isOSX() && !getSetting(store.getState(), 'isTrayIconEnabled'))
+  //   ) {
+  //     unregisterGlobalShortcuts();
 
-      app.quit();
-    }
-  });
+  //     app.quit();
+  //   }
+  // });
 });
 
 // Create a new window if all windows are closed.

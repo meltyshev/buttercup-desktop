@@ -5,7 +5,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(j|t)sx?$/,
         use: 'babel-loader',
         include: [
           join(__dirname, '../src'),
@@ -34,7 +34,7 @@ module.exports = {
     libraryTarget: 'commonjs2'
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.json', '.scss'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.scss'],
     alias: {
       locales: join(__dirname, '../locales')
     }

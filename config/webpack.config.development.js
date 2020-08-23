@@ -1,6 +1,7 @@
 const { resolve } = require('path');
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const baseConfig = require('./webpack.config.base');
 
 module.exports = merge(baseConfig, {
@@ -8,8 +9,8 @@ module.exports = merge(baseConfig, {
 
   entry: {
     main: [
-      'react-hot-loader/patch',
-      resolve(__dirname, '../src/renderer/index')
+      // 'react-hot-loader/patch',
+      resolve(__dirname, '../src/renderer/index.tsx')
     ],
     appPreferences: resolve(__dirname, '../src/renderer/preferences'),
     fileManager: resolve(__dirname, '../src/renderer/file-manager'),
@@ -25,7 +26,8 @@ module.exports = merge(baseConfig, {
     contentBase: baseConfig.output.path,
     publicPath: '/app',
     port: 3000,
-    stats: 'normal'
+    stats: 'minimal',
+    disableHostCheck: true
   },
 
   output: {
@@ -33,7 +35,8 @@ module.exports = merge(baseConfig, {
   },
 
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
+    new ForkTsCheckerWebpackPlugin(),
+    // new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development')
     }),
