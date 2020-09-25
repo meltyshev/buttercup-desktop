@@ -35,7 +35,7 @@ function shouldShowSeparator(index, field, fields) {
 }
 
 const renderMeta = (
-  { fields, t, entry, meta: { touched, error } } // eslint-disable-line react/prop-types
+  { fields, t, icon, meta: { touched, error } } // eslint-disable-line react/prop-types
 ) => (
   <>
     <MetaWrapper>
@@ -50,7 +50,7 @@ const renderMeta = (
               <LabelWrapper>
                 <Choose>
                   <When condition={isTitle}>
-                    <EntryIcon entry={entry} big />
+                    <EntryIcon icon={icon} big />
                   </When>
                   <When condition={field.removeable}>
                     <Field
@@ -120,19 +120,19 @@ renderMeta.propTypes = {
 class EntryForm extends PureComponent {
   static propTypes = {
     handleSubmit: PropTypes.func,
-    entry: PropTypes.object,
+    icon: PropTypes.string,
     t: PropTypes.func
   };
 
   render() {
-    const { entry, handleSubmit, t } = this.props;
+    const { icon, handleSubmit, t } = this.props;
     return (
       <form onSubmit={handleSubmit}>
         <FieldArray
           name="facade.fields"
           component={renderMeta}
           t={t}
-          entry={entry}
+          icon={icon}
         />
       </form>
     );

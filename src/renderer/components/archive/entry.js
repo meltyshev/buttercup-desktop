@@ -75,7 +75,7 @@ class Entry extends PureComponent {
     return {
       content: (
         <EntryForm
-          entry={this.props.entry}
+          icon={this.props.entry.icon}
           ref={form => {
             ref = form;
           }}

@@ -308,14 +308,14 @@ class ArchiveSearch extends PureComponent {
                   autoHeightMax={300}
                 >
                   {entries.map(
-                    ({ entry, sourceID, groupID, path }, entryIndex) => (
+                    ({ entry, sourceID, groupID, icon, path }, entryIndex) => (
                       <ListItem
                         selected={selectedItemIndex === entryIndex}
                         key={entryIndex}
                         onClick={() => this.openEntry(sourceID, entry)}
                       >
                         <Icon>
-                          <EntryIcon entry={entry} />
+                          <EntryIcon icon={icon} />
                         </Icon>
                         <EntryData>
                           <span

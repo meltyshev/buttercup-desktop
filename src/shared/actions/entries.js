@@ -1,6 +1,7 @@
 import { createAction } from 'redux-actions';
 import * as entryTools from '../buttercup/entries';
 import { showDialog, showConfirmDialog } from '../../renderer/system/dialog';
+import { getQueue } from '../../renderer/system/queue';
 import {
   getCurrentGroupId,
   getCurrentArchiveId,
@@ -52,10 +53,13 @@ export const changeMode = mode => () => ({
   payload: mode
 });
 
-export const loadEntries = (archiveId, groupId) => dispatch => {
+export const loadEntries = (archiveId, groupId) => async dispatch => {
   try {
-    const entries = entryTools.loadEntries(archiveId, groupId);
+    const entries = await entryTools.loadEntries(archiveId, groupId);
     dispatch({ type: ENTRIES_LOADED, payload: entries });
+
+    const entriesWithoutIcon = entries.filter(entry => !entry.icon);
+    dispatch(fetchEntryIconsAndUpdate(archiveId, entriesWithoutIcon));
   } catch (err) {
     console.error(err);
     showDialog(err);
@@ -73,6 +77,9 @@ export const updateEntry = newValues => (dispatch, getState) => {
       payload: entryObj
     });
     dispatch(changeMode('view')());
+
+    // Then update the entry icon - might be slower, so we don't want the UI to wait for this
+    dispatch(fetchEntryIconsAndUpdate(archiveId, [newValues]));
   } catch (err) {
     console.error(err);
     showDialog(err);
@@ -100,6 +107,9 @@ export const newEntry = newValues => (dispatch, getState) => {
       payload: entryObj
     });
     dispatch(selectEntry(entryObj.id, true));
+
+    // Then update the entry icon - might be slower, so we don't want the UI to wait for this
+    dispatch(fetchEntryIconsAndUpdate(archiveId, [entryObj]));
   } catch (err) {
     showDialog(err);
   }
@@ -127,6 +137,20 @@ export const deleteEntry = entryId => (dispatch, getState) => {
       });
       entryTools.deleteEntry(archiveId, entryId);
     }
+  });
+};
+
+const fetchEntryIconsAndUpdate = (archiveId, entries) => dispatch => {
+  entries.forEach(entry => {
+    getQueue()
+      .channel('icons')
+      .enqueue(() => {
+        return entryTools.updateEntryIcon(archiveId, entry.id).then(entry => {
+          if (entry.icon) {
+            return dispatch({ type: ENTRIES_UPDATE, payload: entry });
+          }
+        });
+      });
   });
 };
 

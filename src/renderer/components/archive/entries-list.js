@@ -63,7 +63,7 @@ const List = ({ entries, currentEntry, onSelectEntry, onRightClick }) => (
         onClick={() => onSelectEntry(entry.id)}
         onContextMenu={() => onRightClick(entry)}
       >
-        <EntryIcon entry={entry} />
+        <EntryIcon icon={entry.icon} />
         <ListItemContent entry={entry} />
       </ListItem>
     </For>
